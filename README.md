@@ -1,8 +1,8 @@
 # pact-broker-openshift
 An openshift template for pact broker + postgres
 
-# Create template
+### Create template
 oc create -f pact-broker-template.yml
 
-# Create application
+### Create application
 oc new-app pact-broker
