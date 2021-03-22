@@ -17,7 +17,7 @@ objects:
     - annotations: null
       from:
         kind: DockerImage
-        name: pact-broker:latest
+        name: 'pactfoundation/pact-broker:2.79.0.1'
       generation: null
       importPolicy: {}
       name: latest
@@ -26,46 +26,46 @@ objects:
   status:
     dockerImageRepository: ""
 # BUILD CONFIG    
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      app: pact-broker
-    name: pact-broker
-  spec:
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: pact-broker:latest
-    postCommit: {}
-    resources: {}
-    runPolicy: Serial
-    source:
-      contextDir: /pact_broker
-      git:
-        ref: master
-        uri: https://github.com/DiUS/pact_broker-docker.git
-      type: Git
-    strategy:
-      sourceStrategy:
-        from:
-          kind: ImageStreamTag
-          name: ruby:2.4
-          namespace: openshift
-      type: Source
-    triggers:
-    - generic:
-        secret: 521d59e0275bef66
-      type: Generic
-    - github:
-        secret: e5f2f556f5e438a1
-      type: GitHub
-    - imageChange: {}
-      type: ImageChange
-    - type: ConfigChange
-  status:
-    lastVersion: 0
+# - apiVersion: v1
+#   kind: BuildConfig
+#   metadata:
+#     labels:
+#       app: pact-broker
+#     name: pact-broker
+#   spec:
+#     nodeSelector: null
+#     output:
+#       to:
+#         kind: ImageStreamTag
+#         name: 'pactfoundation/pact-broker:2.79.0.1'
+#     postCommit: {}
+#     resources: {}
+#     runPolicy: Serial
+#     source:
+#       contextDir: /pact_broker
+#       git:
+#         ref: master
+#         uri: https://github.com/DiUS/pact_broker-docker.git
+#       type: Git
+#     strategy:
+#       sourceStrategy:
+#         from:
+#           kind: ImageStreamTag
+#           name: ruby:2.4
+#           namespace: openshift
+#       type: Source
+#     triggers:
+#     - generic:
+#         secret: 521d59e0275bef66
+#       type: Generic
+#     - github:
+#         secret: e5f2f556f5e438a1
+#       type: GitHub
+#     - imageChange: {}
+#       type: ImageChange
+#     - type: ConfigChange
+#   status:
+#     lastVersion: 0
 # DEPLOYMENT CONFIG    
 - apiVersion: v1
   kind: DeploymentConfig
@@ -94,6 +94,7 @@ objects:
           app: pact-broker
           deploymentconfig: pact-broker
       spec:
+        serviceAccountName: ruby
         containers:
         - env:
           - name: PACT_BROKER_DATABASE_USERNAME
@@ -107,7 +108,7 @@ objects:
             value: postgresql-pact-broker
           - name: PACT_BROKER_DATABASE_NAME
             value: pact_broker
-          image: pact-broker:latest
+          image: 'pactfoundation/pact-broker:2.79.0.1'
           imagePullPolicy: Always
           name: pact-broker
           ports:
@@ -123,14 +124,14 @@ objects:
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - pact-broker
-        from:
-          kind: ImageStreamTag
-          name: pact-broker:latest
-      type: ImageChange
+    # - imageChangeParams:
+    #     automatic: true
+    #     containerNames:
+    #     - pact-broker
+    #     from:
+    #       kind: ImageStreamTag
+    #       name: pact-broker:2.79.0.0
+    #   type: ImageChange
     - type: ConfigChange
   status:
     availableReplicas: 0
